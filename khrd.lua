@@ -3,23 +3,47 @@ local core = require("khrd.core")
 local component = require("component")
 local event = require("event")
 local gpu = component.gpu
+local term = require("term")
+
+-- configuration
+local khrd_config = core.load_config()
+local old_gpu_settings = {
+  w = 0,
+  h = 0
+}
+
+local key_handlers = {
+  [" "] = {
+    terminate = true,
+    description = "SPACE - exit"
+  }
+}
 
 
 -- initialize common subsystems
 local function khr_initialize()
   core.log_info("Initializing daemon")
-  print(core.load_config())
+  --print(core.load_config())
 end
 
 local function khr_shutdown()
+  core.log_info("Terminated")
 end
 
 -- initializing UI
 local function khr_initialize_visual()
   core.log_info("Initializing display")
+  local _w, _h = gpu.getResolution()
+  old_gpu_settings.w = _w
+  old_gpu_settings.h = _h
+  gpu.setResolution(khrd_config.gpu.w, khrd_config.gpu.h)
+  gpu.fill(1, 1, khrd_config.gpu.w, khrd_config.gpu.h, " ") -- clears the screen
 end
 
 local function khr_restore_visual()
+  gpu.setResolution(old_gpu_settings.w, old_gpu_settings.h)
+  gpu.fill(1, 1, old_gpu_settings.w, old_gpu_settings.h, " ")
+  term.clear()
 end
 
 function khr_handle_event(event_id, ...)
@@ -36,17 +60,31 @@ function khr_handle_event(event_id, ...)
     -- keyboard events
     elseif event_id == "key_up" then
       address, char, code, player = args
-      if char == string.byte(" ") then
-        return false
+      for k, v in pairs(key_handlers) do
+        if char == string.byte(k) then
+          if v.callback ~= nil then
+            v.callback(player)
+          end
+
+          return v.terminate ~= nil and ~v.terminate
+        end
       end
     end 
   end
   return true
 end
 
+-- update callback
+local function khr_update()
+  local offset = 1
+  for k, v in pairs(key_handlers) do
+    gpu.set(1, offset, key_handlers.description)
+    offset = offset + 1
+  end
+end
+
 -- main event loop
 local function khr_event_loop()
-  core.log_info("Entering event loop")
   local running = true
   while running do
     status, result = khr_call(khr_handle_event, event.pull()) -- sleeps until an event is available, then process it
@@ -78,8 +116,11 @@ local function khr_run()
       return
     end
   end
-  
+
+  local updateTimer = event.timer(0.5, khr_update, math.huge)
   khr_call(khr_event_loop)
+  event.cancel(updateTimer)
+
   if gpu ~= nil then
     khr_call(khr_restore_visual)
   end

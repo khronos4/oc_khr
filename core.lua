@@ -36,13 +36,21 @@ function module.collect_components()
 end
 
 -- logging
-function module.log_info(text, ...)
-  print(text, args)
+function module.log_info(...)
+  local str = ""
+  for i,v in ipairs(arg) do
+    str = str .. tostring(v) .. " "
+  end
+  print(str)
 end
 
 -- logging
 function module.log_error(text, ...)
-  io.stderr:write(text, args)
+  local str = ""
+  for i,v in ipairs(arg) do
+    str = str .. tostring(v) .. " "
+  end
+  io.stderr:write(str)
 end
 
 function module.load_config()
