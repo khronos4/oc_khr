@@ -45,7 +45,7 @@ function module.log_info(...)
 end
 
 -- logging
-function module.log_error(...)
+function module.log_error_(...)
   local str = ""
   for i,v in ipairs(arg) do
     str = str .. tostring(v) .. " "
