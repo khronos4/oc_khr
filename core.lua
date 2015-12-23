@@ -57,7 +57,7 @@ function module.load_config()
   path = "/etc/khrd.cfg"
   if not fs.exists(path) then
     local tProcess = process.running()
-    path = fs.concat(fs.path(shell.resolve(tProcess)),"/etc/khrd.cfg")
+    path = fs.concat(fs.path(shell.resolve(tProcess)), "/etc/khrd.cfg")
   end
 
   if not fs.exists(fs.path(path)) then
@@ -68,7 +68,7 @@ function module.load_config()
   end
   local file,msg = io.open(path,"rb")
   if not file then
-    module.log_error("Error while trying to read file at "..path..": "..msg)
+    module.log_error("Error while trying to read file at " .. path .. ": " .. msg)
     return
   end
   local sPacks = file:read("*a")
