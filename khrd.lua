@@ -27,11 +27,11 @@ function khr_handle_event(event_id, ...)
     -- components
     if event_id == "component_added" then
       address, component_type = args
-      core.log_info("Connected " .. component_type .. " at " address)
+      core.log_info("Connected " .. component_type .. " at " .. address)
 
     elseif event_id == "component_removed" then
       address, component_type = args
-      core.log_info("Removed " .. component_type .. " at " address)
+      core.log_info("Removed " .. component_type .. " at " .. address)
 
     -- keyboard events
     elseif event_id == "key_up" then

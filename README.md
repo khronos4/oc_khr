@@ -6,21 +6,22 @@
 in /etc/oppm.cfg
 
     {
-      path="/usr",
-      repos={
+      path = "/usr",
+      repos = {
         ["khronos666/oc_khr"]={
-        ["nidus"] = {
-        ["files"] = {
-            ["master/oc_khr/core.lua] = "/lib/khrd",
-            ["master/oc_khr/khrd.lua"] = "/bin",
-            ["master/oc_khr/khrd.cfg"] = "/etc"
-        },
-        ["repo"] = "tree/master/oc_khr",
-        ["dependencies"] = {},
-        ["name"] = "khrd - custom services",
-        ["description"] = "Custom service",
-        ["authors"] = "khronos666"
-        },
+          oc_khr = {
+            files = {
+                ["master/core.lua"] = "/lib/khrd",
+                ["master/khrd.lua"] = "/bin",
+                ["master/khrd.cfg"] = "/etc"
+            },
+            repo = "tree/master",
+            dependencies = {},
+            name = "khrd - custom services",
+            description = "Custom service",
+            authors = "khronos666",
+            hidden = true
+          }
         }
       }
     }
