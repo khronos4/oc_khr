@@ -8,7 +8,7 @@ in /etc/oppm.cfg
     {
       path="/usr",
       repos={
-        ["OpenPrograms/samis-Programs"]={
+        ["khronos666/oc_khr"]={
         ["nidus"] = {
         ["files"] = {
             ["master/oc_khr/core.lua] = "/lib/khrd",
