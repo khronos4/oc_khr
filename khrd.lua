@@ -105,7 +105,7 @@ local function khr_call(fn, ...)
     return true, data
   end
   core.log_error("Error: " .. tostring(data))
-  core.log_error(tostring(debug.traceback()))
+  core.log_error(debug.traceback())
   return false, data
 end
 

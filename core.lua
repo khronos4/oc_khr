@@ -38,6 +38,7 @@ end
 -- logging
 function module.log_info(...)
   local str = ""
+  local arg={...}
   for i,v in ipairs(arg) do
     str = str .. tostring(v) .. " "
   end
@@ -47,6 +48,7 @@ end
 -- logging
 function module.log_error(...)
   local str = ""
+  local arg={...}
   for i,v in ipairs(arg) do
     str = str .. tostring(v) .. " "
   end
