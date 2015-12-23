@@ -38,8 +38,10 @@ end
 -- logging
 function module.log_info(...)
   local str = ""
-  for i,v in ipairs(arg) do
-    str = str .. tostring(v) .. " "
+  if args then
+    for i,v in ipairs(arg) do
+      str = str .. tostring(v) .. " "
+    end
   end
   print(str)
 end
@@ -47,8 +49,10 @@ end
 -- logging
 function module.log_error(...)
   local str = ""
-  for i,v in ipairs(arg) do
-    str = str .. tostring(v) .. " "
+  if args then
+    for i,v in ipairs(arg) do
+      str = str .. tostring(v) .. " "
+    end
   end
   io.stderr:write(str)
 end
