@@ -8,6 +8,7 @@ local gpu = component.gpu
 -- initialize common subsystems
 local function khr_initialize()
   core.log_info("Initializing daemon")
+  print(core.load_config())
 end
 
 local function khr_shutdown()
@@ -26,8 +27,11 @@ function khr_handle_event(event_id, ...)
     -- components
     if event_id == "component_added" then
       address, component_type = args
+      core.log_info("Connected " .. component_type .. " at " address)
+
     elseif event_id == "component_removed" then
       address, component_type = args
+      core.log_info("Removed " .. component_type .. " at " address)
 
     -- keyboard events
     elseif event_id == "key_up" then
@@ -67,7 +71,7 @@ local function khr_run()
   local status, result = khr_call(khr_initialize)
   if not status then return end
   
-  if gpu != nil then
+  if gpu ~= nil then
     local status, result = khr_call(khr_initialize_visual)
     if not status then 
       khr_call(khr_shutdown)

@@ -1,4 +1,13 @@
+-- based on:
+--   https://github.com/MightyPirates/OpenComputers/blob/master-MC1.7.10/src/main/resources/assets/opencomputers/loot/OPPM/oppm.lua
+
 local component = require("component")
+local event = require("event")
+local fs = require("filesystem")
+local process = require("process")
+local serial = require("serialization")
+local shell = require("shell")
+local term = require("term")
 
 local module = {}
 
@@ -33,8 +42,30 @@ end
 
 -- logging
 function module.log_error(text, ...)
-  print(text, args)
+  io.stderr:write(text, args)
 end
 
+function module.load_config()
+  path = "/etc/khrd.cfg"
+  if not fs.exists(path) then
+    local tProcess = process.running()
+    path = fs.concat(fs.path(shell.resolve(tProcess)),"/etc/khrd.cfg")
+  end
+
+  if not fs.exists(fs.path(path)) then
+    fs.makeDirectory(fs.path(path))
+  end
+  if not fs.exists(path) then
+    return {-1}
+  end
+  local file,msg = io.open(path,"rb")
+  if not file then
+    module.log_error("Error while trying to read file at "..path..": "..msg)
+    return
+  end
+  local sPacks = file:read("*a")
+  file:close()
+  return serial.unserialize(sPacks) or {-1}
+end
 
 return module
