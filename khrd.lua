@@ -66,7 +66,11 @@ function khr_handle_event(event_id, ...)
             v.callback(player)
           end
 
-          return v.terminate ~= nil and ~v.terminate
+          if v.terminate == nil then
+            return true
+          end
+
+          return not v.terminate
         end
       end
     end 
