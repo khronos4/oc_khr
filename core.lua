@@ -21,7 +21,9 @@ function module.collect_components()
 
     for name, member in pairs(proxy) do
       if type(member) == "table" or type(member) == "function" then
-        methods[name] = component.doc(address, name)
+        local doc = component.doc(address, name)
+        if not doc then doc = "" end
+        methods[name] = doc
       else
         methods[name] = ""
       end
