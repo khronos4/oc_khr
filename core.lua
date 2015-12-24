@@ -118,9 +118,11 @@ function module.load_mods()
     if not mod then break end
     if not fs.isDirectory(mod) then
       module.log_info("Loading " .. mod)
-      status, mod_data = module.call(function() return loadfile(mod) end)
-      if status then
-        result[fs.name(mod)] = mod_data
+      mod_data, status = loadfile(path .. mod)
+      if not status then
+        result[mod] = mod_data
+      else
+        module.log_error(status)
       end
     end
   end
