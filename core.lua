@@ -1,5 +1,4 @@
--- based on:
---   https://github.com/MightyPirates/OpenComputers/blob/master-MC1.7.10/src/main/resources/assets/opencomputers/loot/OPPM/oppm.lua
+local util = require("khrd.util")
 
 local component = require("component")
 local event = require("event")
@@ -81,6 +80,8 @@ function module.disable_term_log()
 end
 
 function module.load_config()
+  -- based on code from:
+  --   https://github.com/MightyPirates/OpenComputers/blob/master-MC1.7.10/src/main/resources/assets/opencomputers/loot/OPPM/oppm.lua
   path = "/etc/khrd.cfg"
   if not fs.exists(path) then
     local tProcess = process.running()
@@ -104,8 +105,7 @@ function module.load_config()
 end
 
 function module.load_mods()
-  local tProcess = process.running()
-  path = fs.concat(fs.path(shell.resolve(tProcess)), "/usr/lib/khrd/modules/")
+  path = "/usr/lib/khrd/modules/"
   local it, msg = fs.list(path)
   if not it then
     module.log_error(msg)
@@ -113,17 +113,17 @@ function module.load_mods()
   end
 
   result = {}
-  do
+  while true do
     local mod = it()
     if not mod then break end
     if not fs.isDirectory(mod) then
       module.log_info("Loading " .. mod)
-      status, mod_data = module.call(function() loadfile(mod)() end)
+      status, mod_data = module.call(function() return loadfile(mod) end)
       if status then
         result[fs.name(mod)] = mod_data
       end
     end
-  while true
+  end
 
   return result
 end

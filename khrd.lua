@@ -26,6 +26,7 @@ local key_handlers = {
   --  handler = function() core.log_error("Test error") end
   --}
 }
+
 local khrd_modules = {}
 
 
@@ -44,10 +45,12 @@ function UI.create(ctx, x, y, w, h)
   data.menu = {
     {name = "Information", draw = "draw_info_menu"},
     {name = "Components", draw = "draw_components_menu", onenter = "components_sub"},
-    {name = "Dummy Menu #1"},
-    {name = "Dummy Menu #2"},
-    {name = "Dummy Menu #3"}
   }
+
+  for name, mod in pairs(khrd_modules) do
+    data.menu[#data.menu + 1] = {name = mod.name}
+  end
+
   data.menu_state = util.stack()
   data.menu_state:push(1)
   return data
