@@ -22,8 +22,7 @@ local key_handlers = {
 
 -- pcall wrapper with tracebacks
 local function khr_call(fn, ...)
-  local args = table.unpack({...})
-  local status, data = pcall(fn, args)
+  local status, data = pcall(fn, ...)
   if status then
     return true, data
   end
@@ -50,6 +49,13 @@ local function khr_initialize_visual()
   local _w, _h = gpu.getResolution()
   old_gpu_settings.w = _w
   old_gpu_settings.h = _h
+  if not khrd_config.gpu.w then
+    khrd_config.gpu.w = _w
+  end
+  if not khrd_config.gpu.h then
+    khrd_config.gpu.w = _h
+  end
+
   gpu.setResolution(khrd_config.gpu.w, khrd_config.gpu.h)
   gpu.fill(1, 1, khrd_config.gpu.w, khrd_config.gpu.h, " ") -- clears the screen
 end
@@ -67,8 +73,7 @@ end
 
 local khr_event_handlers = setmetatable({}, { __index = function() return unknown_event end })
  
-function khr_event_handlers.key_up(adress, char, code, playerName)
-  print(address .. " " .. char)
+function khr_event_handlers.key_up(address, char, code, player_name)
   for k, v in pairs(key_handlers) do
     if char == string.byte(k) then
       if v.callback ~= nil then
@@ -101,6 +106,7 @@ function khr_handle_event(event_id, ...)
   end
   return true
 end
+
 
 -- update callback
 local function khr_update()
