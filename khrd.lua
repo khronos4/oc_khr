@@ -9,6 +9,7 @@ local term = require("term")
 local unicode = require("unicode")
 local keyboard = require("keyboard")
 local computer = require("computer")
+local sides = require("sides")
 
 -- configuration
 local khrd_config = core.load_config()
@@ -48,7 +49,7 @@ function UI.create(ctx, x, y, w, h)
   }
 
   for name, mod in pairs(khrd_modules) do
-    local mod_instance = mod.init(ctx)
+    local mod_instance = mod.init(ctx, khrd_config)
     data.menu[#data.menu + 1] = {name = mod.name, mod = mod_instance, draw = "draw_mod"}
   end
 
@@ -205,13 +206,24 @@ local function khr_call(fn, ...)
 end
 
 
+local function khr_reset_redstone()
+  for address, component_type in component.list("redstone") do
+    local p = component.proxy(address)
+    for i = 0, 5 do
+      p.setOutput(i, 0)
+    end
+  end
+end
+
 -- initialize common subsystems
 local function khr_initialize()
   core.log_info("Initializing daemon")
   khrd_modules = core.load_mods()
+  khr_reset_redstone()
 end
 
 local function khr_shutdown()
+  khr_reset_redstone()
   core.log_info("Terminated")
 end
 
