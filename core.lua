@@ -52,6 +52,9 @@ function module.log_info(...)
   if module.log_to_term then
     print(str)
   end
+  local f = filesystem.open("/var/log/khrd.log", "a")
+  f:write("[I] " .. str .. "\n")
+  f:close()
 end
 
 -- logging
@@ -65,6 +68,9 @@ function module.log_error(...)
   if module.log_to_term then
     io.stderr:write(str .. "\n")
   end
+  local f = filesystem.open("/var/log/khrd.log", "a")
+  f:write("[E] " .. str .. "\n")
+  f:close()
 end
 
 function module.get_log()

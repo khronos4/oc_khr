@@ -48,8 +48,8 @@ function Mod:get_coils()
 end
 
 
-function module.init(ctx)
-  return Mod.create(ctx)
+function module.init(ctx, cfg)
+  return Mod.create(ctx, cfg)
 end
 
 return module
