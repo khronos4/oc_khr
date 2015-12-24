@@ -9,7 +9,9 @@ local term = require("term")
 local khrd_config = core.load_config()
 local old_gpu_settings = {
   w = 0,
-  h = 0
+  h = 0,
+  background = nil,
+  foreground = nil
 }
 
 local key_handlers = {
@@ -36,7 +38,6 @@ end
 -- initialize common subsystems
 local function khr_initialize()
   core.log_info("Initializing daemon")
-  --print(core.load_config())
 end
 
 local function khr_shutdown()
@@ -49,19 +50,26 @@ local function khr_initialize_visual()
   local _w, _h = gpu.getResolution()
   old_gpu_settings.w = _w
   old_gpu_settings.h = _h
-  if not khrd_config.gpu.w then
+  if khrd_config.gpu.w == nil or khrd_config.gpu.w == 0 then
     khrd_config.gpu.w = _w
   end
-  if not khrd_config.gpu.h then
-    khrd_config.gpu.w = _h
+  if khrd_config.gpu.h == nil or khrd_config.gpu.h == 0 then
+    khrd_config.gpu.h = _h
   end
 
+  core.log_info("Setting resolution to " .. khrd_config.gpu.w .. "x" .. khrd_config.gpu.h)
   gpu.setResolution(khrd_config.gpu.w, khrd_config.gpu.h)
+  old_gpu_settings.background = gpu.getBackground()
+  old_gpu_settings.foreground = gpu.getForeground()
+  gpu.setBackground(0x000000)
+  gpu.setForeground(0xFFFFFF)
   gpu.fill(1, 1, khrd_config.gpu.w, khrd_config.gpu.h, " ") -- clears the screen
 end
 
 local function khr_restore_visual()
   gpu.setResolution(old_gpu_settings.w, old_gpu_settings.h)
+  gpu.setBackground(old_gpu_settings.background)
+  gpu.setForeground(old_gpu_settings.foreground)
   gpu.fill(1, 1, old_gpu_settings.w, old_gpu_settings.h, " ")
   term.clear()
 end
@@ -115,6 +123,7 @@ local function khr_update()
     gpu.set(1, offset, key_handlers.description)
     offset = offset + 1
   end
+  gpu.set(1, offset, key_handlers.description)
 end
 
 -- main event loop
