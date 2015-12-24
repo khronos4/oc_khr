@@ -100,6 +100,8 @@ local function khr_update()
     gpu.set(1, offset, key_handlers.description)
     offset = offset + 1
   end
+
+  gpu.set(1, offset, "Test")
 end
 
 -- main event loop
