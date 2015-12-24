@@ -39,7 +39,6 @@ function module.h_split(ctx, x, y, w)
   ctx.set(x + w, y, module.symbols.h_split_right)
   if w > 1 then
     ctx.fill(x + 1, y, w - 1, 1, module.symbols.h_line)
-    ctx.fill(x + 1, y + h, w - 1, 1, module.symbols.h_line)
   end
 end
 

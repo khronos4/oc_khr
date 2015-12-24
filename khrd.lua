@@ -39,17 +39,25 @@ function UI.create(ctx, x, y, w, h)
   data.w = w
   data.h = h
 
-  local components = core.collect_components()
   data.menu = {
     {name = "Information", draw = "draw_info_menu"},
-    {name = "Components"},
+    {name = "Components", draw = "draw_components_menu", onenter = "components_sub"},
     {name = "Dummy Menu #1"},
     {name = "Dummy Menu #2"},
     {name = "Dummy Menu #3"}
   }
   data.menu_state = util.stack()
-  data.menu_state:push(data.menu[1].name)
+  data.menu_state:push(1)
   return data
+end
+
+function UI:current_menu()
+  local menu = self.menu
+  for i = 0, self.menu_state:getn() - 1 do
+    if menu[self.menu_state:last()].menu then
+      menu = menu[self.menu_state:last()].menu
+  end
+  return menu
 end
 
 function UI:draw()
@@ -58,20 +66,15 @@ function UI:draw()
   drawing.h_split(self.ctx, self.x + 21, self.y + 2, self.w - 22)
 
   local offset = 0
-  if self.menu_state:getn() > 1 then
-    self.ctx.set(self.x + 3, self.y + i + offset, "..")
-    offset = offset + 1
-  end
-
-  local menu = self.menu
+  local menu = self:current_menu()
   local draw_fn = nil
 
-  for i=1, #self.menu do
-    if self.menu_state:last() == self.menu[i].name then
+  for i=1, #menu do
+    if self.menu_state:last() == i then
       drawing.arrow(self.ctx, self.x + 1, self.y + i + offset, 0)
-      draw_fn = self.menu[i].draw
+      draw_fn = menu[i].draw
     end
-    self.ctx.set(self.x + 3, self.y + i + offset, self.menu[i].name)
+    self.ctx.set(self.x + 3, self.y + i + offset, menu[i].name)
   end
 
   if draw_fn then
@@ -80,31 +83,30 @@ function UI:draw()
 end
 
 function UI:key_down(char, code)
-  local id = 0
-  for i=1, #self.menu do
-    if self.menu_state:last() == self.menu[i].name then
-      id = i
-      break
-    end
-  end
+  local menu = self:current_menu()
 
+  local id = self.menu_state:last()
   if code == keyboard.keys.up then
     if id > 1 then
       id = id - 1 
       self.menu_state:pop()
-      self.menu_state:push(self.menu[id].name)
+      self.menu_state:push(menu[id].name)
       self:update_menu_selection()
     end
   elseif code == keyboard.keys.down then
-    if id < #self.menu then
+    if id < #menu then
       id = id + 1
       self.menu_state:pop()
-      self.menu_state:push(self.menu[id].name)
+      self.menu_state:push(menu[id].name)
       self:update_menu_selection()
      end
   elseif code == keyboard.keys.left then
   elseif code == keyboard.keys.right then
   elseif code == keyboard.keys.enter then
+    enter_fn = menu[id].onenter
+    if enter_fn then
+      self[enter_fn](self, menu[id])
+    end
   end
 end
 
@@ -117,13 +119,39 @@ end
 function UI:draw_info_menu(x, y, w, h)
   local caption = "Information"
   local offset = (w - string.len(caption)) / 2
-  self.ctx.set(x + offset, y, "Information")
+  self.ctx.set(x + offset, y, caption)
+end
+
+function UI:draw_components_menu(x, y, w, h)
+  local caption = "Components"
+  local offset = (w - string.len(caption)) / 2
+  self.ctx.set(x + offset, y, caption)
+
+  local text = "Press ENTER to view components list"
+  local offset = (w - string.len(text)) / 2
+  self.ctx.set(x + offset, y + h / 2, text)
+
+end
+
+function UI:components_sub(menu)
+  menu.menu = {
+    {name = "..", onenter = "go_back"},
+    {name = "Dummy"},
+    {name = "Dummy 2"},
+  }
+  self.menu_state:push(menu.menu[1].name)
+  self:update_menu_selection()
+end
+
+function UI:go_back(menu)
+  self.menu_state:pop()
+  self:update_menu_selection()
 end
 
 
 -- pcall wrapper with tracebacks
 local function khr_call(fn, ...)
-  local status, data = xpcall(fn, function(err) return debug.traceback(err, 1) end, ...)
+  local status, data = xpcall(fn, function(err) return debug.traceback(err) end, ...)
   if status then
     return true, data
   end
