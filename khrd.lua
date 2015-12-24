@@ -53,9 +53,13 @@ end
 
 function UI:current_menu()
   local menu = self.menu
-  for i = 0, self.menu_state:getn() - 1 do
-    if menu[self.menu_state:last()].menu then
-      menu = menu[self.menu_state:last()].menu
+  for i = 1, self.menu_state:getn() - 1 do
+    local id = self.menu_state.get()[i]
+    if menu[id].menu then
+      menu = menu[id].menu
+    else
+      return nil
+    end
   end
   return menu
 end
@@ -90,14 +94,14 @@ function UI:key_down(char, code)
     if id > 1 then
       id = id - 1 
       self.menu_state:pop()
-      self.menu_state:push(menu[id].name)
+      self.menu_state:push(id)
       self:update_menu_selection()
     end
   elseif code == keyboard.keys.down then
     if id < #menu then
       id = id + 1
       self.menu_state:pop()
-      self.menu_state:push(menu[id].name)
+      self.menu_state:push(id)
       self:update_menu_selection()
      end
   elseif code == keyboard.keys.left then
@@ -105,7 +109,7 @@ function UI:key_down(char, code)
   elseif code == keyboard.keys.enter then
     enter_fn = menu[id].onenter
     if enter_fn then
-      self[enter_fn](self, menu[id])
+      self[enter_fn](self, menu[id], id)
     end
   end
 end
@@ -133,17 +137,17 @@ function UI:draw_components_menu(x, y, w, h)
 
 end
 
-function UI:components_sub(menu)
+function UI:components_sub(menu, id)
   menu.menu = {
     {name = "..", onenter = "go_back"},
     {name = "Dummy"},
     {name = "Dummy 2"},
   }
-  self.menu_state:push(menu.menu[1].name)
+  self.menu_state:push(id)
   self:update_menu_selection()
 end
 
-function UI:go_back(menu)
+function UI:go_back(menu, id)
   self.menu_state:pop()
   self:update_menu_selection()
 end
