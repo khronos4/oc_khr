@@ -11,10 +11,7 @@ local unicode = require("unicode")
 -- configuration
 local khrd_config = core.load_config()
 local old_gpu_settings = {
-  w = 0,
-  h = 0,
-  background = nil,
-  foreground = nil
+  w = 0, h = 0, background = nil, foreground = nil
 }
 
 local key_handlers = {
@@ -22,10 +19,10 @@ local key_handlers = {
     terminate = true,
     description = "SPACE - exit"
   },
-  ["e"] = {
-    description = "E - log error message",
-    handler = function() core.log_error("Test error") end
-  }
+  --["e"] = {
+  --  description = "E - log error message",
+  --  handler = function() core.log_error("Test error") end
+  --}
 }
 
 
@@ -43,14 +40,14 @@ function UI.create(ctx, x, y, w, h)
 
   local components = core.collect_components()
   data.menu = {
-    {name = "Components", menu = {
-      {name = "Some component"}
-    }},
+    {name = "Information"},
+    {name = "Components"},
     {name = "Dummy Menu #1"},
     {name = "Dummy Menu #2"},
     {name = "Dummy Menu #2"}
   }
-  data.menu_state = {}
+  data.menu_state = util.stack()
+  data.menu_state:push(data.menu[1].name)
   return data
 end
 
@@ -58,9 +55,19 @@ function UI:draw()
   drawing.box(self.ctx, self.x, self.y, 20, self.h - 1)
   drawing.box(self.ctx, self.x + 21, self.y, self.w - 22, self.h - 1)
 
+  local offset = 0
+  if self.menu_state:getn() > 1 then
+    self.ctx.set(self.x + 3, self.y + i + offset, "..")
+    offset = offset + 1
+  end
+
+  local menu = self.menu
+
   for i=1, #self.menu do
-    drawing.arrow(self.ctx, self.x + 1, self.y + i, 0)
-    self.ctx.set(self.x + 2, self.y + i, self.menu[i].name)
+    if self.menu_state:last() == self.menu[i].name then
+      drawing.arrow(self.ctx, self.x + 1, self.y + i + offset, 0)
+    end
+    self.ctx.set(self.x + 3, self.y + i + offset, self.menu[i].name)
   end
 end
 
@@ -78,7 +85,6 @@ local function khr_call(fn, ...)
   --core.log_error(debug.traceback())
   return false, data
 end
-
 
 
 -- initialize common subsystems
@@ -130,7 +136,6 @@ local function khr_restore_visual()
 end
 
 function unknown_event()
-  -- do nothing if the event wasn't relevant
   return true
 end
 
@@ -179,10 +184,15 @@ end
 local function khr_update()
   -- draw key descriptions
   local offset = 1
+  local keys_help = ""
   for k, v in pairs(key_handlers) do
-    gpu.set(1, offset, v.description)
-    offset = offset + 1
+    keys_help = keys_help .. v.description .. " "
+    --gpu.set(1, offset, v.description)
+    --offset = offset + 1
   end
+  gpu.set(1, offset, keys_help)
+  offset = offset + 1
+
 
   -- display last log lines
   local log = core.get_log()

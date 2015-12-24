@@ -54,6 +54,14 @@ function stack:create()
     return #self._et
   end
 
+  function t:get()
+    return self._et
+  end
+
+  function t:last()
+    return self._et[#self._et]
+  end
+
   -- list values
   function t:list()
     for i,v in pairs(self._et) do
