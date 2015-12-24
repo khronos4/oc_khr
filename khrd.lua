@@ -123,12 +123,11 @@ end
 
 -- pcall wrapper with tracebacks
 local function khr_call(fn, ...)
-  local status, data = pcall(fn, ...)
+  local status, data = xpcall(fn, function(err) return debug.traceback(err, 4) end, ...)
   if status then
     return true, data
   end
-  core.log_error("Error: " .. tostring(data))
-  --core.log_error(debug.traceback())
+  core.log_error("Error: " ..  string.gsub(tostring(data), "\n", " "))
   return false, data
 end
 
