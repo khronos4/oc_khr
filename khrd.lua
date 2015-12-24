@@ -8,6 +8,7 @@ local gpu = component.gpu
 local term = require("term")
 local unicode = require("unicode")
 local keyboard = require("keyboard")
+local computer = require("computer")
 
 -- configuration
 local khrd_config = core.load_config()
@@ -25,6 +26,7 @@ local key_handlers = {
   --  handler = function() core.log_error("Test error") end
   --}
 }
+local khrd_modules = {}
 
 
 UI = {}
@@ -122,6 +124,12 @@ end
 
 function UI:draw_info_menu(menu, x, y, w, h)
   drawing.text_centered(self.ctx, x, y, w, 0, "Information")
+
+  local h_offset = 12
+  self.ctx.set(x, y + 2, "Uptime: ") self.ctx.set(x + h_offset, y + 2, tostring(computer.uptime()))
+  self.ctx.set(x, y + 3, "Address: ") self.ctx.set(x + h_offset, y + 3, computer.address())
+  self.ctx.set(x, y + 4, "Memory: ") self.ctx.set(x + h_offset, y + 4, tostring(computer.freeMemory()) .. " / " .. tostring(computer.totalMemory()))
+  self.ctx.set(x, y + 5, "Energy: ") self.ctx.set(x + h_offset, y + 5, tostring(computer.energy()) .. " / " .. tostring(computer.maxEnergy()))
 end
 
 function UI:draw_components_menu(menu, x, y, w, h)
@@ -139,8 +147,11 @@ function UI:draw_component_menu(menu, x, y, w, h)
   local i = 0
   for name, value in pairs(menu.component[2].methods) do
     local description = name .. " " .. tostring(value)
-    self.ctx.set(x + 2, y + 4 + i, string.sub(description, 0, w))
+    self.ctx.set(x + 2, y + 4 + i, string.sub(description, 0, w - 2))
     i = i + 1
+    if i == h then
+      break
+    end
   end
 end
 
@@ -180,21 +191,14 @@ end
 
 -- pcall wrapper with tracebacks
 local function khr_call(fn, ...)
-  local status, data = xpcall(fn, function(err) return debug.traceback(err) end, ...)
-  if status then
-    return true, data
-  end
-  local lines = util.split(data, "\n")
-  for i = 1, #lines do
-    core.log_error(string.gsub(lines[i], "\t", " "))
-  end
-  return false, data
+  return core.call(fn, ...)
 end
 
 
 -- initialize common subsystems
 local function khr_initialize()
   core.log_info("Initializing daemon")
+  khrd_modules = core.load_mods()
 end
 
 local function khr_shutdown()

@@ -103,4 +103,41 @@ function module.load_config()
   return serial.unserialize(sPacks) or {-1}
 end
 
+function module.load_mods()
+  local tProcess = process.running()
+  path = fs.concat(fs.path(shell.resolve(tProcess)), "/usr/lib/khrd/modules/")
+  local it, msg = fs.list(path)
+  if not it then
+    module.log_error(msg)
+    return {}
+  end
+
+  result = {}
+  do
+    local mod = it()
+    if not mod then break end
+    if not fs.isDirectory(mod) then
+      module.log_info("Loading " .. mod)
+      status, mod_data = module.call(function() loadfile(mod)() end)
+      if status then
+        result[fs.name(mod)] = mod_data
+      end
+    end
+  while true
+
+  return result
+end
+
+function module.call(fn, ...)
+  local status, data = xpcall(fn, function(err) return debug.traceback(err) end, ...)
+  if status then
+    return true, data
+  end
+  local lines = util.split(data, "\n")
+  for i = 1, #lines do
+    module.log_error(string.gsub(lines[i], "\t", " "))
+  end
+  return false, data
+end
+
 return module
