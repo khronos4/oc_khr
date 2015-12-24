@@ -22,7 +22,7 @@ local key_handlers = {
 
 -- pcall wrapper with tracebacks
 local function khr_call(fn, ...)
-  local args={...}
+  local args = table.unpack({...})
   local status, data = pcall(fn, args)
   if status then
     return true, data
@@ -60,35 +60,44 @@ local function khr_restore_visual()
   term.clear()
 end
 
-function khr_handle_event(event_id, ...)
-  local args={...}
-  if event_id then -- can be nil if no event was pulled for some time
-    -- components
-    if event_id == "component_added" then
-      address, component_type = args
-      core.log_info("Connected " .. component_type .. " at " .. address)
+function unknown_event()
+  -- do nothing if the event wasn't relevant
+  return true
+end
 
-    elseif event_id == "component_removed" then
-      address, component_type = args
-      core.log_info("Removed " .. component_type .. " at " .. address)
-
-    -- keyboard events
-    elseif event_id == "key_up" then
-      address, char, code, player = args
-      for k, v in pairs(key_handlers) do
-        if char == string.byte(k) then
-          if v.callback ~= nil then
-            v.callback(player)
-          end
-
-          if v.terminate == nil then
-            return true
-          end
-
-          return not v.terminate
-        end
+local khr_event_handlers = setmetatable({}, { __index = function() return unknown_event end })
+ 
+function khr_event_handlers.key_up(adress, char, code, playerName)
+  print(address .. " " .. char)
+  for k, v in pairs(key_handlers) do
+    if char == string.byte(k) then
+      if v.callback ~= nil then
+        v.callback(player)
       end
-    end 
+
+      if v.terminate == nil then
+        return true
+      end
+
+      return not v.terminate
+    end
+  end
+  return true
+end
+
+function khr_event_handlers.component_added(address, component_type)
+  core.log_info("Connected " .. component_type .. " at " .. address)
+  return true
+end
+
+function khr_event_handlers.component_removed(address, component_type)
+  core.log_info("Removed " .. component_type .. " at " .. address)
+  return true
+end
+
+function khr_handle_event(event_id, ...)
+  if event_id then 
+    return khr_event_handlers[event_id](...)
   end
   return true
 end
@@ -100,8 +109,6 @@ local function khr_update()
     gpu.set(1, offset, key_handlers.description)
     offset = offset + 1
   end
-
-  gpu.set(1, offset, "Test")
 end
 
 -- main event loop
