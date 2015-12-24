@@ -82,16 +82,16 @@ function UI:key_down(char, code)
   end
 
   if code == keyboard.keys.up then
-    if i > 1 then i = i - 1 end
+    if id > 1 then id = id - 1 end
   elseif code == keyboard.keys.down then
-    if i < #self.menu then i = i + 1 end
+    if id < #self.menu then id = id + 1 end
   elseif code == keyboard.keys.left then
   elseif code == keyboard.keys.right then
   elseif code == keyboard.keys.enter then
   end
 
-  data.menu_state:pop()
-  data.menu_state:push(data.menu[i].name)
+  self.menu_state:pop()
+  self.menu_state:push(self.menu[id].name)
 end
 
 function UI:key_up(char, code)

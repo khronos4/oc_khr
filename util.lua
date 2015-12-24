@@ -46,7 +46,7 @@ function stack:create()
       end
     end
     -- return unpacked entries
-    return unpack(entries)
+    return table.unpack(entries)
   end
 
   -- get entries
