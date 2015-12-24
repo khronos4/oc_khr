@@ -181,6 +181,37 @@ local function khr_restore_visual()
   khrd_ui = nil
 end
 
+local function khr_redraw()
+  -- draw key descriptions
+  local offset = 1
+  local keys_help = ""
+  for k, v in pairs(key_handlers) do
+    keys_help = keys_help .. v.description .. " "
+    --gpu.set(1, offset, v.description)
+    --offset = offset + 1
+  end
+  gpu.set(1, offset, keys_help)
+  offset = offset + 1
+
+  -- display last log lines
+  local log = core.get_log()
+  local num_lines = math.min(4, #log)
+  local offset = #log - num_lines
+  for i = 1, num_lines do
+    gpu.fill(1, khrd_config.gpu.h - 5 + i, old_gpu_settings.w, 1, " ")
+    gpu.set(1, khrd_config.gpu.h - 5 + i, unicode.char(0x2B24))
+    if log[offset + i][1] then
+      gpu.setForeground(0xFF0000)
+    end
+    gpu.set(3, khrd_config.gpu.h - 5 + i, log[offset + i][2])
+    gpu.setForeground(0xFFFFFF)
+  end
+
+  if khrd_ui then
+    khrd_ui:draw()
+  end
+end
+
 function unknown_event()
   return true
 end
@@ -227,43 +258,17 @@ end
 
 function khr_handle_event(event_id, ...)
   if event_id then 
-    return khr_event_handlers[event_id](...)
+    local result = khr_event_handlers[event_id](...)
+    khr_call(khr_redraw)
+    return result
   end
+  khr_call(khr_redraw)
   return true
 end
 
-
 -- update callback
 local function khr_update()
-  -- draw key descriptions
-  local offset = 1
-  local keys_help = ""
-  for k, v in pairs(key_handlers) do
-    keys_help = keys_help .. v.description .. " "
-    --gpu.set(1, offset, v.description)
-    --offset = offset + 1
-  end
-  gpu.set(1, offset, keys_help)
-  offset = offset + 1
-
-
-  -- display last log lines
-  local log = core.get_log()
-  local num_lines = math.min(4, #log)
-  local offset = #log - num_lines
-  for i = 1, num_lines do
-    gpu.fill(1, khrd_config.gpu.h - 5 + i, old_gpu_settings.w, 1, " ")
-    gpu.set(1, khrd_config.gpu.h - 5 + i, unicode.char(0x2B24))
-    if log[offset + i][1] then
-      gpu.setForeground(0xFF0000)
-    end
-    gpu.set(3, khrd_config.gpu.h - 5 + i, log[offset + i][2])
-    gpu.setForeground(0xFFFFFF)
-  end
-
-  if khrd_ui then
-    khrd_ui:draw()
-  end
+  -- drawing perfromed for all events
 end
 
 -- use safe call with error logging
