@@ -69,6 +69,8 @@ local function khr_initialize_visual()
   gpu.setBackground(0x000000)
   gpu.setForeground(0xFFFFFF)
   gpu.fill(1, 1, khrd_config.gpu.w, khrd_config.gpu.h, " ") -- clears the screen
+
+  core.disable_term_log()
 end
 
 local function khr_restore_visual()
@@ -77,6 +79,8 @@ local function khr_restore_visual()
   gpu.setForeground(old_gpu_settings.foreground)
   gpu.fill(1, 1, old_gpu_settings.w, old_gpu_settings.h, " ")
   term.clear()
+
+  core.enable_term_log()
 end
 
 function unknown_event()
@@ -135,11 +139,11 @@ local function khr_update()
   local num_lines = math.min(4, #log)
   local offset = #log - num_lines
   for i = 1, num_lines do
+    gpu.fill(1, khrd_config.gpu.h - 5 + i, old_gpu_settings.w, 1, " ")
+    gpu.set(1, khrd_config.gpu.h - 5 + i, unicode.char(0x2B24))
     if log[offset + i][1] then
       gpu.setForeground(0xFF0000)
     end
-    gpu.fill(1, 1, old_gpu_settings.w, 1, " ")
-    gpu.set(1, khrd_config.gpu.h - 5 + i, unicode.char(0x2B24))
     gpu.set(3, khrd_config.gpu.h - 5 + i, log[offset + i][2])
     gpu.setForeground(0xFFFFFF)
   end

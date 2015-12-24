@@ -36,6 +36,7 @@ function module.collect_components()
 end
 
 module.log = {}
+module.log_to_term = true
 
 -- logging
 function module.log_info(...)
@@ -45,7 +46,9 @@ function module.log_info(...)
     str = str .. tostring(v) .. " "
   end
   module.log[#module.log + 1] = {false, str}
-  print(str)
+  if module.log_to_term then
+    print(str)
+  end
 end
 
 -- logging
@@ -56,11 +59,21 @@ function module.log_error(...)
     str = str .. tostring(v) .. " "
   end
   module.log[#module.log + 1] = {true, str}
-  io.stderr:write(str .. "\n")
+  if module.log_to_term then
+    io.stderr:write(str .. "\n")
+  end
 end
 
 function module.get_log()
   return module.log
+end
+
+function module.enable_term_log()
+  module.log_to_term = true
+end
+
+function module.disable_term_log()
+  module.log_to_term = false
 end
 
 function module.load_config()
