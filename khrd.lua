@@ -47,6 +47,7 @@ local function khr_restore_visual()
 end
 
 function khr_handle_event(event_id, ...)
+  local args={...}
   if event_id then -- can be nil if no event was pulled for some time
     -- components
     if event_id == "component_added" then
@@ -100,12 +101,13 @@ end
 
 -- pcall wrapper with tracebacks
 local function khr_call(fn, ...)
+  local args={...}
   local status, data = pcall(fn, args)
   if status then
     return true, data
   end
   core.log_error("Error: " .. tostring(data))
-  core.log_error(debug.traceback())
+  --core.log_error(debug.traceback())
   return false, data
 end
 
