@@ -4,6 +4,7 @@ local component = require("component")
 local event = require("event")
 local gpu = component.gpu
 local term = require("term")
+local unicode = require("unicode")
 
 -- configuration
 local khrd_config = core.load_config()
@@ -18,6 +19,10 @@ local key_handlers = {
   [" "] = {
     terminate = true,
     description = "SPACE - exit"
+  },
+  ["e"] = {
+    description = "E - log error message",
+    handler = function() core.log_error("Test error") end
   }
 }
 
@@ -84,8 +89,8 @@ local khr_event_handlers = setmetatable({}, { __index = function() return unknow
 function khr_event_handlers.key_up(address, char, code, player_name)
   for k, v in pairs(key_handlers) do
     if char == string.byte(k) then
-      if v.callback ~= nil then
-        v.callback(player)
+      if v.handler ~= nil then
+        v.handler(player)
       end
 
       if v.terminate == nil then
@@ -133,6 +138,7 @@ local function khr_update()
     if log[offset + i][1] then
       gpu.setForeground(0xFF0000)
     end
+    gpu.fill(1, 1, old_gpu_settings.w, 1, " ")
     gpu.set(1, khrd_config.gpu.h - 5 + i, unicode.char(0x2B24))
     gpu.set(3, khrd_config.gpu.h - 5 + i, log[offset + i][2])
     gpu.setForeground(0xFFFFFF)
