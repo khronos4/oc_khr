@@ -20,6 +20,20 @@ local key_handlers = {
 }
 
 
+-- pcall wrapper with tracebacks
+local function khr_call(fn, ...)
+  local args={...}
+  local status, data = pcall(fn, args)
+  if status then
+    return true, data
+  end
+  core.log_error("Error: " .. tostring(data))
+  --core.log_error(debug.traceback())
+  return false, data
+end
+
+
+
 -- initialize common subsystems
 local function khr_initialize()
   core.log_info("Initializing daemon")
@@ -97,18 +111,6 @@ local function khr_event_loop()
       running = result
     end
   end
-end
-
--- pcall wrapper with tracebacks
-local function khr_call(fn, ...)
-  local args={...}
-  local status, data = pcall(fn, args)
-  if status then
-    return true, data
-  end
-  core.log_error("Error: " .. tostring(data))
-  --core.log_error(debug.traceback())
-  return false, data
 end
 
 local function khr_run()
