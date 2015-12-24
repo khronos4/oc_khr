@@ -54,7 +54,7 @@ end
 function UI:current_menu()
   local menu = self.menu
   for i = 1, self.menu_state:getn() - 1 do
-    local id = self.menu_state.get()[i]
+    local id = self.menu_state:get()[i]
     if menu[id].menu then
       menu = menu[id].menu
     else
@@ -132,6 +132,16 @@ end
 function UI:draw_component_menu(menu, x, y, w, h)
   local caption = menu.component[2].name .. " " .. menu.component[1]
   drawing.text_centered(self.ctx, x, y, w, 0, caption)
+
+  self.ctx.set(x, y + 2, "Type: " .. menu.component[2].type)
+  self.ctx.set(x, y + 3, "Methods/fields: ")
+
+  local i = 0
+  for name, value in pairs(menu.component[2].methods) do
+    local description = name .. " " .. tostring(value)
+    self.ctx.set(x + 2, y + 4 + i, string.sub(description, 0, w))
+    i = i + 1
+  end
 end
 
 
@@ -151,7 +161,11 @@ function UI:components_sub(menu, id)
 
   table.sort(sorted, compare)
   for i = 1, #sorted do
-    menu.menu[#menu.menu + 1] = {name = sorted[i][2].name, component = sorted[i]}
+    menu.menu[#menu.menu + 1] = {
+      name = sorted[i][2].name,
+      component = sorted[i],
+      draw = "draw_component_menu"
+    }
   end
 
   self.menu_state:push(1)
