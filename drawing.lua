@@ -10,6 +10,9 @@ module.symbols = {
   corner_3 = unicode.char(0x251B), -- ┛
   corner_4 = unicode.char(0x250F), -- ┏
   arrow_right = unicode.char(0x2BC8), -- ⯈
+  arrow_left = unicode.char(0x2BC7), -- ⯇
+  arrow_up = unicode.char(0x2BC5), -- ⯅
+  arrow_down = unicode.char(0x2BC6), -- ⯆
 }
 
 function module.box(ctx, x, y, w, h)
@@ -28,4 +31,16 @@ function module.box(ctx, x, y, w, h)
   end
 end
 
-return drawing
+function module.arrow(ctx, x, y, id)
+  if id == 0 then
+    ctx.set(x, y, module.symbols.arrow_right)
+  elseif id == 1 then
+    ctx.set(x, y, module.symbols.arrow_left)
+  elseif id == 2 then
+    ctx.set(x, y, module.symbols.arrow_up)
+  elseif id == 3 then
+    ctx.set(x, y, module.symbols.arrow_down)
+  end
+end
+
+return module

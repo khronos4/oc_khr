@@ -59,6 +59,7 @@ function UI:draw()
   drawing.box(self.ctx, self.x + 21, self.y, self.w - 22, self.h - 1)
 
   for i=1, #self.menu do
+    drawing.arrow(self.ctx, self.x + 1, self.y + i, 0)
     self.ctx.set(self.x + 2, self.y + i, self.menu[i].name)
   end
 end
