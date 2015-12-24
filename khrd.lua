@@ -1,4 +1,6 @@
 local core = require("khrd.core")
+local util = require("khrd.util")
+local drawing = require("khrd.drawing")
 
 local component = require("component")
 local event = require("event")
@@ -27,6 +29,44 @@ local key_handlers = {
 }
 
 
+UI = {}
+UI.__index = UI
+
+function UI.create(ctx, x, y, w, h)
+  local data = {}
+  setmetatable(data, UI)
+  data.ctx = ctx
+  data.x = x
+  data.y = y
+  data.w = w
+  data.h = h
+
+  local components = core.collect_components()
+  data.menu = {
+    {name = "Components", menu = {
+      {name = "Some component"}
+    }},
+    {name = "Dummy Menu #1"},
+    {name = "Dummy Menu #2"},
+    {name = "Dummy Menu #2"}
+  }
+  data.menu_state = {}
+  return data
+end
+
+function UI:draw()
+  drawing.box(self.ctx, self.x, self.y, 20, self.h - 1)
+  drawing.box(self.ctx, self.x + 21, self.y, self.w - 22, self.h - 1)
+
+  for i=1, #self.menu do
+    self.ctx.set(self.x + 2, self.y + i, self.menu[i].name)
+  end
+end
+
+function UI:key_up(char, code)
+end
+
+
 -- pcall wrapper with tracebacks
 local function khr_call(fn, ...)
   local status, data = pcall(fn, ...)
@@ -48,6 +88,8 @@ end
 local function khr_shutdown()
   core.log_info("Terminated")
 end
+
+local khrd_ui = nil
 
 -- initializing UI
 local function khr_initialize_visual()
@@ -71,6 +113,8 @@ local function khr_initialize_visual()
   gpu.fill(1, 1, khrd_config.gpu.w, khrd_config.gpu.h, " ") -- clears the screen
 
   core.disable_term_log()
+
+  khrd_ui = UI.create(gpu, 1, 3, khrd_config.gpu.w, khrd_config.gpu.h - 3 - 4)
 end
 
 local function khr_restore_visual()
@@ -81,6 +125,7 @@ local function khr_restore_visual()
   term.clear()
 
   core.enable_term_log()
+  khrd_ui = nil
 end
 
 function unknown_event()
@@ -91,6 +136,10 @@ end
 local khr_event_handlers = setmetatable({}, { __index = function() return unknown_event end })
  
 function khr_event_handlers.key_up(address, char, code, player_name)
+  if khrd_ui then
+    khrd_ui:key_up(char, code)
+  end
+
   for k, v in pairs(key_handlers) do
     if char == string.byte(k) then
       if v.handler ~= nil then
@@ -146,6 +195,10 @@ local function khr_update()
     end
     gpu.set(3, khrd_config.gpu.h - 5 + i, log[offset + i][2])
     gpu.setForeground(0xFFFFFF)
+  end
+
+  if khrd_ui then
+    khrd_ui:draw()
   end
 end
 

@@ -12,6 +12,8 @@ in /etc/oppm.cfg
           oc_khr = {
             files = {
                 ["master/core.lua"] = "/lib/khrd",
+                ["master/drawing.lua"] = "/lib/khrd",
+                ["master/util.lua"] = "/lib/khrd",
                 ["master/khrd.lua"] = "/bin",
                 ["master/khrd.cfg"] = "/etc"
             },
