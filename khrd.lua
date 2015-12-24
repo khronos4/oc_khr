@@ -7,6 +7,7 @@ local event = require("event")
 local gpu = component.gpu
 local term = require("term")
 local unicode = require("unicode")
+local keyboard = require("keyboard")
 
 -- configuration
 local khrd_config = core.load_config()
@@ -71,6 +72,28 @@ function UI:draw()
   end
 end
 
+function UI:key_down(char, code)
+  local id = 0
+  for i=1, #self.menu do
+    if self.menu_state:last() == self.menu[i].name then
+      id = i
+      break
+    end
+  end
+
+  if code == keyboard.keys.up then
+    if i > 1 then i = i - 1 end
+  elseif code == keyboard.keys.down then
+    if i < #self.menu then i = i + 1 end
+  elseif code == keyboard.keys.left then
+  elseif code == keyboard.keys.right then
+  elseif code == keyboard.keys.enter then
+  end
+
+  data.menu_state:pop()
+  data.menu_state:push(data.menu[i].name)
+end
+
 function UI:key_up(char, code)
 end
 
@@ -119,9 +142,9 @@ local function khr_initialize_visual()
   gpu.setForeground(0xFFFFFF)
   gpu.fill(1, 1, khrd_config.gpu.w, khrd_config.gpu.h, " ") -- clears the screen
 
-  core.disable_term_log()
-
   khrd_ui = UI.create(gpu, 1, 3, khrd_config.gpu.w, khrd_config.gpu.h - 3 - 4)
+
+  core.disable_term_log()
 end
 
 local function khr_restore_visual()
@@ -158,6 +181,13 @@ function khr_event_handlers.key_up(address, char, code, player_name)
 
       return not v.terminate
     end
+  end
+  return true
+end
+
+function khr_event_handlers.key_down(address, char, code, player_name)
+  if khrd_ui then
+    khrd_ui:key_down(char, code)
   end
   return true
 end
