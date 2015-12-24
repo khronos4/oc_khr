@@ -48,7 +48,8 @@ function UI.create(ctx, x, y, w, h)
   }
 
   for name, mod in pairs(khrd_modules) do
-    data.menu[#data.menu + 1] = {name = mod.name}
+    local mod_instance = mod.init(ctx)
+    data.menu[#data.menu + 1] = {name = mod.name, mod = mod_instance, draw = "draw_mod"}
   end
 
   data.menu_state = util.stack()
@@ -123,6 +124,12 @@ function UI:key_up(char, code)
 end
 
 function UI:update_menu_selection()
+end
+
+function UI:draw_mod(menu, x, y, w, h)
+  if menu.mod then
+    menu.mod:draw_view(menu, x, y, w, h)
+  end
 end
 
 function UI:draw_info_menu(menu, x, y, w, h)

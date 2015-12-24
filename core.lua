@@ -120,7 +120,7 @@ function module.load_mods()
       module.log_info("Loading " .. mod)
       mod_data, status = loadfile(path .. mod)
       if not status then
-        result[mod] = mod_data
+        result[mod] = mod_data()
       else
         module.log_error(status)
       end
