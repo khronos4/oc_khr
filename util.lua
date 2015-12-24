@@ -80,4 +80,10 @@ function module.stack()
   return stack:create()
 end
 
+function module.split(str, sep)
+  fields = {}
+  str:gsub("([^"..sep.."]*)"..sep, function(c) table.insert(fields, c) end)
+  return fields
+end
+
 return module

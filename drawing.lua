@@ -34,7 +34,7 @@ function module.box(ctx, x, y, w, h)
 end
 
 function module.h_split(ctx, x, y, w)
-  ctx.fill(x, y, w, h, " ")
+  ctx.fill(x, y, w, 1, " ")
   ctx.set(x, y, module.symbols.h_split_left)
   ctx.set(x + w, y, module.symbols.h_split_right)
   if w > 1 then

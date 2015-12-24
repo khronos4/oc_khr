@@ -123,11 +123,14 @@ end
 
 -- pcall wrapper with tracebacks
 local function khr_call(fn, ...)
-  local status, data = xpcall(fn, function(err) return debug.traceback(err, 4) end, ...)
+  local status, data = xpcall(fn, function(err) return debug.traceback(err, 1) end, ...)
   if status then
     return true, data
   end
-  core.log_error("Error: " ..  string.gsub(tostring(data), "\n", " "))
+  local lines = util.split(data, "\n")
+  for i = 1, #lines do
+    core.log_error(string.gsub(lines[i], "\t", " "))
+  end
   return false, data
 end
 
@@ -164,7 +167,7 @@ local function khr_initialize_visual()
   gpu.setForeground(0xFFFFFF)
   gpu.fill(1, 1, khrd_config.gpu.w, khrd_config.gpu.h, " ") -- clears the screen
 
-  khrd_ui = UI.create(gpu, 1, 3, khrd_config.gpu.w, khrd_config.gpu.h - 3 - 4)
+  khrd_ui = UI.create(gpu, 1, 3, khrd_config.gpu.w, khrd_config.gpu.h - 3 - khrd_config.log.max_lines)
 
   core.disable_term_log()
 end
@@ -194,15 +197,15 @@ local function khr_redraw()
 
   -- display last log lines
   local log = core.get_log()
-  local num_lines = math.min(4, #log)
+  local num_lines = math.min(khrd_config.log.max_lines, #log)
   local offset = #log - num_lines
   for i = 1, num_lines do
-    gpu.fill(1, khrd_config.gpu.h - 5 + i, old_gpu_settings.w, 1, " ")
-    gpu.set(1, khrd_config.gpu.h - 5 + i, unicode.char(0x2B24))
+    gpu.fill(1, khrd_config.gpu.h - 1 - khrd_config.log.max_lines + i, old_gpu_settings.w, 1, " ")
+    gpu.set(1, khrd_config.gpu.h - 1 - khrd_config.log.max_lines + i, unicode.char(0x2B24))
     if log[offset + i][1] then
       gpu.setForeground(0xFF0000)
     end
-    gpu.set(3, khrd_config.gpu.h - 5 + i, log[offset + i][2])
+    gpu.set(3, khrd_config.gpu.h - 1 - khrd_config.log.max_lines + i, log[offset + i][2])
     gpu.setForeground(0xFFFFFF)
   end
 
