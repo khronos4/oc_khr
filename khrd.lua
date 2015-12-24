@@ -41,11 +41,11 @@ function UI.create(ctx, x, y, w, h)
 
   local components = core.collect_components()
   data.menu = {
-    {name = "Information"},
+    {name = "Information", draw = "draw_info_menu"},
     {name = "Components"},
     {name = "Dummy Menu #1"},
     {name = "Dummy Menu #2"},
-    {name = "Dummy Menu #2"}
+    {name = "Dummy Menu #3"}
   }
   data.menu_state = util.stack()
   data.menu_state:push(data.menu[1].name)
@@ -55,6 +55,7 @@ end
 function UI:draw()
   drawing.box(self.ctx, self.x, self.y, 20, self.h - 1)
   drawing.box(self.ctx, self.x + 21, self.y, self.w - 22, self.h - 1)
+  drawing.h_split(self.ctx, self.x + 21, self.y + 2, self.w - 22)
 
   local offset = 0
   if self.menu_state:getn() > 1 then
@@ -63,12 +64,18 @@ function UI:draw()
   end
 
   local menu = self.menu
+  local draw_fn = nil
 
   for i=1, #self.menu do
     if self.menu_state:last() == self.menu[i].name then
       drawing.arrow(self.ctx, self.x + 1, self.y + i + offset, 0)
+      draw_fn = self.menu[i].draw
     end
     self.ctx.set(self.x + 3, self.y + i + offset, self.menu[i].name)
+  end
+
+  if draw_fn then
+    self[draw_fn](self, self.x + 22, self.y + 1, self.w - 23, self.h - 2)
   end
 end
 
@@ -82,19 +89,35 @@ function UI:key_down(char, code)
   end
 
   if code == keyboard.keys.up then
-    if id > 1 then id = id - 1 end
+    if id > 1 then
+      id = id - 1 
+      self.menu_state:pop()
+      self.menu_state:push(self.menu[id].name)
+      self:update_menu_selection()
+    end
   elseif code == keyboard.keys.down then
-    if id < #self.menu then id = id + 1 end
+    if id < #self.menu then
+      id = id + 1
+      self.menu_state:pop()
+      self.menu_state:push(self.menu[id].name)
+      self:update_menu_selection()
+     end
   elseif code == keyboard.keys.left then
   elseif code == keyboard.keys.right then
   elseif code == keyboard.keys.enter then
   end
-
-  self.menu_state:pop()
-  self.menu_state:push(self.menu[id].name)
 end
 
 function UI:key_up(char, code)
+end
+
+function UI:update_menu_selection()
+end
+
+function UI:draw_info_menu(x, y, w, h)
+  local caption = "Information"
+  local offset = (w - string.len(caption)) / 2
+  self.ctx.set(x + offset, y, "Information")
 end
 
 
