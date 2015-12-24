@@ -125,13 +125,16 @@ local function khr_update()
     offset = offset + 1
   end
 
-  local num_lines = math.min(4, #core.log)
-  local offset = #core.log - num_lines
+  -- display last log lines
+  local log = core.get_log()
+  local num_lines = math.min(4, #log)
+  local offset = #log - num_lines
   for i = 1, num_lines do
-    if core.log[offset + i][1] then
+    if log[offset + i][1] then
       gpu.setForeground(0xFF0000)
     end
-    gpu.set(1, khrd_config.gpu.h - 5 + i, core.log[offset + i][2])
+    gpu.set(1, khrd_config.gpu.h - 5 + i, unicode.char(0x2B24))
+    gpu.set(3, khrd_config.gpu.h - 5 + i, log[offset + i][2])
     gpu.setForeground(0xFFFFFF)
   end
 end

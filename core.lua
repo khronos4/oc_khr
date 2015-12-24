@@ -55,8 +55,12 @@ function module.log_error(...)
   for i,v in ipairs(arg) do
     str = str .. tostring(v) .. " "
   end
-  module.log[#module.log + 1] = {false, str}
+  module.log[#module.log + 1] = {true, str}
   io.stderr:write(str .. "\n")
+end
+
+function module.get_log()
+  return module.log
 end
 
 function module.load_config()
