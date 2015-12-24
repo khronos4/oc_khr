@@ -78,11 +78,11 @@ function UI:draw()
       drawing.arrow(self.ctx, self.x + 1, self.y + i + offset, 0)
       draw_fn = menu[i].draw
     end
-    self.ctx.set(self.x + 3, self.y + i + offset, menu[i].name)
+    self.ctx.set(self.x + 3, self.y + i + offset, string.sub(menu[i].name, 0, 18))
   end
 
   if draw_fn then
-    self[draw_fn](self, self.x + 22, self.y + 1, self.w - 23, self.h - 2)
+    self[draw_fn](self, menu[self.menu_state:last()], self.x + 22, self.y + 1, self.w - 23, self.h - 2)
   end
 end
 
@@ -120,30 +120,41 @@ end
 function UI:update_menu_selection()
 end
 
-function UI:draw_info_menu(x, y, w, h)
-  local caption = "Information"
-  local offset = (w - string.len(caption)) / 2
-  self.ctx.set(x + offset, y, caption)
+function UI:draw_info_menu(menu, x, y, w, h)
+  drawing.text_centered(self.ctx, x, y, w, 0, "Information")
 end
 
-function UI:draw_components_menu(x, y, w, h)
-  local caption = "Components"
-  local offset = (w - string.len(caption)) / 2
-  self.ctx.set(x + offset, y, caption)
-
-  local text = "Press ENTER to view components list"
-  local offset = (w - string.len(text)) / 2
-  self.ctx.set(x + offset, y + h / 2, text)
-
+function UI:draw_components_menu(menu, x, y, w, h)
+  drawing.text_centered(self.ctx, x, y, w, 0, "Components")
+  drawing.text_centered(self.ctx, x, y, w, h, "Press ENTER to view components list")
 end
+
+function UI:draw_component_menu(menu, x, y, w, h)
+  local caption = menu.component[2].name .. " " .. menu.component[1]
+  drawing.text_centered(self.ctx, x, y, w, 0, caption)
+end
+
 
 function UI:components_sub(menu, id)
   menu.menu = {
-    {name = "..", onenter = "go_back"},
-    {name = "Dummy"},
-    {name = "Dummy 2"},
+    {name = "..", onenter = "go_back"}
   }
-  self.menu_state:push(id)
+  local sorted = {}
+  local components = core.collect_components()
+  for k, v in pairs(components) do
+    sorted[#sorted + 1] = {k, v}
+  end
+
+  function compare(a, b)
+    return a[2].name < b[2].name
+  end
+
+  table.sort(sorted, compare)
+  for i = 1, #sorted do
+    menu.menu[#menu.menu + 1] = {name = sorted[i][2].name, component = sorted[i]}
+  end
+
+  self.menu_state:push(1)
   self:update_menu_selection()
 end
 

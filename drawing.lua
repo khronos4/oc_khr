@@ -55,4 +55,9 @@ function module.arrow(ctx, x, y, id)
   end
 end
 
+function module.text_centered(ctx, x, y, w, h, text)
+  local offset = (w - string.len(text)) / 2
+  ctx.set(x + offset, y + h / 2, text)
+end
+
 return module
