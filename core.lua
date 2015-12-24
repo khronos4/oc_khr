@@ -35,6 +35,8 @@ function module.collect_components()
   return components
 end
 
+module.log = {}
+
 -- logging
 function module.log_info(...)
   local str = ""
@@ -42,6 +44,7 @@ function module.log_info(...)
   for i,v in ipairs(arg) do
     str = str .. tostring(v) .. " "
   end
+  module.log[#module.log + 1] = {false, str}
   print(str)
 end
 
@@ -52,7 +55,8 @@ function module.log_error(...)
   for i,v in ipairs(arg) do
     str = str .. tostring(v) .. " "
   end
-  io.stderr:write(str)
+  module.log[#module.log + 1] = {false, str}
+  io.stderr:write(str .. "\n")
 end
 
 function module.load_config()

@@ -118,12 +118,27 @@ end
 
 -- update callback
 local function khr_update()
+  -- draw key descriptions
   local offset = 1
   for k, v in pairs(key_handlers) do
-    gpu.set(1, offset, key_handlers.description)
+    gpu.set(1, offset, v.description)
     offset = offset + 1
   end
-  gpu.set(1, offset, key_handlers.description)
+
+  local num_lines = math.min(4, #core.log)
+  local offset = #core.log - num_lines
+  for i = 1, num_lines do
+    if core.log[offset + i][1] then
+      gpu.setForeground(0xFF0000)
+    end
+    gpu.set(1, khrd_config.gpu.h - 5 + i, core.log[offset + i][2])
+    gpu.setForeground(0xFFFFFF)
+  end
+end
+
+-- use safe call with error logging
+local function khr_update_()
+  khr_call(khr_update)
 end
 
 -- main event loop
@@ -149,7 +164,7 @@ local function khr_run()
     end
   end
 
-  local updateTimer = event.timer(0.5, khr_update, math.huge)
+  local updateTimer = event.timer(0.5, khr_update_, math.huge)
   khr_call(khr_event_loop)
   event.cancel(updateTimer)
 
