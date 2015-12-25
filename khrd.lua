@@ -120,13 +120,15 @@ function UI:key_down(char, code)
     end
   end
   if menu[id].mod then
-    menu[id].mod:key_down(menu[id], char, code
+    core.call(function() menu[id].mod:key_down(menu[id], char, code) end)
   end
 end
 
 function UI:key_up(char, code)
+  local menu = self:current_menu()
+  local id = self.menu_state:last()
   if menu[id].mod then
-    menu[id].mod:key_up(menu[id], char, code
+    core.call(function() menu[id].mod:key_up(menu[id], char, code) end)
   end
 end
 
@@ -135,7 +137,7 @@ end
 
 function UI:draw_mod(menu, x, y, w, h)
   if menu.mod then
-    menu.mod:draw_view(menu, x, y, w, h)
+    core.call(function() menu.mod:draw_view(menu, x, y, w, h) end)
   end
 end
 
@@ -204,6 +206,15 @@ function UI:go_back(menu, id)
   self.menu_state:pop()
   self:update_menu_selection()
 end
+
+function UI:update()
+  for _, menu in ipairs(self.menu) do
+    if menu.mod then
+      core.call(function() menu.mod:update() end)
+    end
+  end
+end
+
 
 
 -- pcall wrapper with tracebacks
@@ -360,6 +371,7 @@ end
 -- update callback
 local function khr_update()
   -- drawing perfromed for all events
+  khrd_ui:update()
 end
 
 -- use safe call with error logging

@@ -40,6 +40,7 @@ end
 
 module.log = {}
 module.log_to_term = true
+module.log_to_file = true
 
 -- logging
 function module.log_info(...)

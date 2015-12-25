@@ -43,7 +43,7 @@ function Mod:draw_view(menu, x, y, w, h)
       local info = "<not found>"
       if coil then
         info = coil.getName() .. "  Charge: " .. tostring(coil.getEnergy() / 1000000) .. " M, "
-        info = info .. "Power: " .. tostring(coil.getPower()) .. ", Ration: " .. tostring(coil.getRatio())
+        info = info .. "Power: " .. tostring(coil.getPower()) .. ", Ratio: " .. tostring(coil.getRatio())
       end
       self.ctx.set(x, y + 2 + i, "  " .. addr .. "   " .. info)
       i = i + 1
@@ -55,7 +55,7 @@ end
 function Mod:on_key_down(menu, char, code)
   if char == string.byte("C") then
     for group, setting in pairs(data.cfg) do
-      local rs = Mod::get_charger_redstone(group)
+      local rs = Mod:get_charger_redstone(group)
       if not rs then
         core.log_error("Redstone control for " .. group .. " not found")
       else
@@ -82,7 +82,7 @@ function Mod:update()
       if coil and setting.charging then
         local energy = coil.getEnergy() / 1000000
         if energy >= setting.max then
-          local rs = Mod::get_charger_redstone(group)
+          local rs = Mod:get_charger_redstone(group)
           if rs then
             core.log_info("Coil group " .. group .. " charged")
             rs.disable()
