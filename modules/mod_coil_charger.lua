@@ -43,7 +43,7 @@ function Mod:draw_view(menu, x, y, w, h)
       local info = "<not found>"
       if coil then
         info = coil.getName() .. "  Charge: " .. tostring(coil.getEnergy() / 1000000) .. " M, "
-        info = info .. "Power: " .. tostring(coil.getPower()) .. ", Ratio: " .. tostring(coil.getRatio())
+        --info = info .. "Power: " .. tostring(coil.getPower()) .. ", Ratio: " .. tostring(coil.getRatio())
       end
       self.ctx.set(x, y + 2 + i, "  " .. addr .. "   " .. info)
       i = i + 1
@@ -52,10 +52,10 @@ function Mod:draw_view(menu, x, y, w, h)
   end
 end
 
-function Mod:on_key_down(menu, char, code)
-  if char == string.byte("C") then
-    for group, setting in pairs(data.cfg) do
-      local rs = Mod:get_charger_redstone(group)
+function Mod:key_down(menu, char, code)
+  if char == string.byte("c") then
+    for group, setting in pairs(self.cfg) do
+      local rs = self:get_charger_redstone(group)
       if not rs then
         core.log_error("Redstone control for " .. group .. " not found")
       else
@@ -68,12 +68,12 @@ function Mod:on_key_down(menu, char, code)
         end
       end
     end
-  elseif char == string.byte("D") then
+  elseif char == string.byte("d") then
 
   end
 end
 
-function Mod:on_key_up(menu, char, code)
+function Mod:key_up(menu, char, code)
 end
 
 function Mod:update()
@@ -82,7 +82,7 @@ function Mod:update()
       if coil and setting.charging then
         local energy = coil.getEnergy() / 1000000
         if energy >= setting.max then
-          local rs = Mod:get_charger_redstone(group)
+          local rs = self:get_charger_redstone(group)
           if rs then
             core.log_info("Coil group " .. group .. " charged")
             rs.disable()
@@ -111,11 +111,20 @@ function Mod:get_charger_redstone(group)
   local addr = self.cfg[group].charger_rs.addr
   local side = self.cfg[group].charger_rs.side
 
-  if not addr then return nil end
-  if not sides[side] then return nil end
+  if not addr then 
+    core.log_error("Invalid redstone I/O address of group " .. group)
+    return nil 
+  end
+  if not sides[side] then
+  core.log_error("Invalid redstone I/O side of group " .. group) 
+    return nil 
+  end
 
   local rs = component.proxy(addr)
-  if not rs then return nil end
+  if not rs then 
+    core.log_error("Redstone I/O group " .. group .. " was not found by address " .. addr)
+    return nil 
+  end
 
   return {
     enable = function() rs.setOutput(sides[side], 255) end,
