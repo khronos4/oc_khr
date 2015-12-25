@@ -119,9 +119,15 @@ function UI:key_down(char, code)
       self[enter_fn](self, menu[id], id)
     end
   end
+  if menu[id].mod then
+    menu[id].mod:key_down(menu[id], char, code
+  end
 end
 
 function UI:key_up(char, code)
+  if menu[id].mod then
+    menu[id].mod:key_up(menu[id], char, code
+  end
 end
 
 function UI:update_menu_selection()
