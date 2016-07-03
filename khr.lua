@@ -49,8 +49,8 @@ function UI.create(ctx, x, y, w, h)
   }
 
   for name, mod in pairs(khrd_modules) do
-    local mod_instance = mod.init(ctx, khrd_config)
-    data.menu[#data.menu + 1] = {name = mod.name, mod = mod_instance, draw = "draw_mod"}
+    mod.init_visual(ctx)
+    data.menu[#data.menu + 1] = {name = mod.name, mod = mod, draw = "draw_mod"}
   end
 
   data.menu_state = util.stack()
@@ -235,12 +235,13 @@ end
 -- initialize common subsystems
 local function khr_initialize()
   core.log_info("Initializing daemon")
-  khrd_modules = core.load_mods(khrd_config)
-  khr_reset_redstone()
+  for name, mod in pairs(core.load_mods(khrd_config)) do
+    local mod_instance = mod.init(ctx, khrd_config)
+    khrd_modules[name] = mod_instance
+  end
 end
 
 local function khr_shutdown()
-  khr_reset_redstone()
   core.log_info("Terminated")
 end
 
@@ -391,6 +392,7 @@ local function khr_event_loop()
 end
 
 local function khr_run()
+  core.log_to_file = false
   local status, result = khr_call(khr_initialize)
   if not status then return end
   

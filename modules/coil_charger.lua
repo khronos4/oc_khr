@@ -7,13 +7,13 @@ local module = {
   name = "RC Coil Charger"
 }
 
-Mod = {}
+local Mod = {}
 Mod.__index = Mod
 
-function Mod.create(ctx, cfg)
+function Mod.create(cfg)
   local data = {}
   setmetatable(data, Mod)
-  data.ctx = ctx
+  data.ctx = nil
   data.cfg = cfg.mod.coil_charger
   for group, setting in pairs(data.cfg) do
     setting.charging = false
@@ -21,6 +21,10 @@ function Mod.create(ctx, cfg)
     setting.pulse = true
   end 
   return data
+end
+
+function Mod:init_visual(ctx)
+  self.ctx = ctx
 end
 
 function Mod:draw_view(menu, x, y, w, h)
@@ -132,9 +136,8 @@ function Mod:get_charger_redstone(group)
   }
 end
 
-
-function module.init(ctx, cfg)
-  return Mod.create(ctx, cfg)
+function module.init(cfg)
+  return Mod.create(cfg)
 end
 
 return module
