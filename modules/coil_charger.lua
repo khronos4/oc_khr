@@ -4,7 +4,7 @@ local component = require("component")
 local sides = require("sides")
 
 local module = {
-  name = "Coil Charger"
+  name = "RC Coil Charger"
 }
 
 Mod = {}
@@ -24,7 +24,7 @@ function Mod.create(ctx, cfg)
 end
 
 function Mod:draw_view(menu, x, y, w, h)
-  drawing.text_centered(self.ctx, x, y, w, 0, "Coil Charger")
+  drawing.text_centered(self.ctx, x, y, w, 0, "RC Coil Charger")
 
   local i = 0
   for group, setting in pairs(self.cfg) do

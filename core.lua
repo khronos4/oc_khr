@@ -126,7 +126,7 @@ function module.load_mods(config)
     local mod = it()
     if not mod then break end
     if not fs.isDirectory(mod) then
-      if config.mod["coil_charger"] ~= nil then
+      if config.mod[mod] ~= nil then
         module.log_info("Loading " .. mod)
         mod_data, status = loadfile(path .. mod)
         if not status then
