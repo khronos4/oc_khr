@@ -236,7 +236,7 @@ end
 local function khr_initialize()
   core.log_info("Initializing daemon")
   for name, mod in pairs(core.load_mods(khrd_config)) do
-    local mod_instance = mod.init(ctx, khrd_config)
+    local mod_instance = mod.init(khrd_config)
     khrd_modules[name] = mod_instance
   end
 end
