@@ -235,7 +235,7 @@ end
 -- initialize common subsystems
 local function khr_initialize()
   core.log_info("Initializing daemon")
-  khrd_modules = core.load_mods()
+  khrd_modules = core.load_mods(khrd_config)
   khr_reset_redstone()
 end
 

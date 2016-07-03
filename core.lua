@@ -113,7 +113,7 @@ function module.load_config()
   return serial.unserialize(sPacks) or {-1}
 end
 
-function module.load_mods()
+function module.load_mods(config)
   path = "/usr/lib/khrd/modules/"
   local it, msg = fs.list(path)
   if not it then
@@ -126,12 +126,16 @@ function module.load_mods()
     local mod = it()
     if not mod then break end
     if not fs.isDirectory(mod) then
-      module.log_info("Loading " .. mod)
-      mod_data, status = loadfile(path .. mod)
-      if not status then
-        result[mod] = mod_data()
+      if config.mod["coil_charger"] ~= nil then
+        module.log_info("Loading " .. mod)
+        mod_data, status = loadfile(path .. mod)
+        if not status then
+          result[mod] = mod_data()
+        else
+          module.log_error(status)
+        end
       else
-        module.log_error(status)
+        module.log_info("No config entry for mod " .. mod)
       end
     end
   end
