@@ -11,12 +11,14 @@ in /etc/oppm.cfg
         ["khronos666/oc_khr"]={
           oc_khr = {
             files = {
-                ["master/khrd.lua"] = "/bin",
-                ["master/khrd.cfg"] = "/etc",
+                ["master/khr.lua"] = "/bin",
+                ["master/khrd.lua"] = "//etc/rc.d",
+                ["master/khrd.cfg"] = "//etc",
                 ["master/core.lua"] = "/lib/khrd",
                 ["master/drawing.lua"] = "/lib/khrd",
                 ["master/util.lua"] = "/lib/khrd",
-                ["master/modules/mod_coil_charger.lua"] = "/lib/khrd/modules",
+                ["master/modules/coil_charger.lua"] = "/lib/khrd/modules",
+                ["master/modules/fs.lua"] = "/lib/khrd/modules",
             },
             repo = "tree/master",
             dependencies = {},
